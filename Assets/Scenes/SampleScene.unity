@@ -278,6 +278,8 @@ MonoBehaviour:
   gameTransform: {fileID: 714614811}
   piecePrefab: {fileID: 1492240422}
   size: 3
+  normalMaterial: {fileID: 2100000, guid: bde210af2c0d041a1ad42e564ad721c8, type: 2}
+  highlightMaterial: {fileID: 2100000, guid: 47b2ba1650191497bbf08b539a9a0fc4, type: 2}
 --- !u!4 &787848969
 Transform:
   m_ObjectHideFlags: 0
@@ -305,13 +307,17 @@ PrefabInstance:
       propertyPath: m_Name
       value: GamePiece
       objectReference: {fileID: 0}
+    - target: {fileID: 6059489344937051073, guid: 7df619d14bf2d4653a0c9172c7af19de, type: 3}
+      propertyPath: m_TagString
+      value: PuzzlePiece
+      objectReference: {fileID: 0}
     - target: {fileID: 8875922539194444208, guid: 7df619d14bf2d4653a0c9172c7af19de, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -18.07
+      value: -17.06
       objectReference: {fileID: 0}
     - target: {fileID: 8875922539194444208, guid: 7df619d14bf2d4653a0c9172c7af19de, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -5.07
+      value: -2.65
       objectReference: {fileID: 0}
     - target: {fileID: 8875922539194444208, guid: 7df619d14bf2d4653a0c9172c7af19de, type: 3}
       propertyPath: m_LocalPosition.z
