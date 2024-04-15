@@ -6,7 +6,7 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] private Transform gameTransform;
     [SerializeField] private Transform piecePrefab;
-    public int size = 3;
+    public int size = 4;
     private Transform[,] piecesArray;
     public Material normalMaterial; // Material normal de las piezas
     public Material highlightMaterial; // Material para resaltar la pieza seleccionada
@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviour
         for (int row = 0; row < size; row++) {
             for (int col = 0; col < size; col++) {
                 Transform piece = Instantiate(piecePrefab, gameTransform);
-                // pieces.Add(piece);
+
                 // Pieces will be in a game board going from -1 to +1.
                 piece.localPosition = new Vector3(-1 + (2 * width * col) + width,
                                                 +1 - (2 * width * row) - width,
@@ -133,16 +133,24 @@ public class GameManager : MonoBehaviour
                 {
                     if (!selected1)
                     {
-                        selected1 = true;
-                        selectedPosition1 = hitObject.name;
-                        HighlightPiece(hitObject);
+                        int indiceFila, indiceColumna;
+                        if (TryFindTransformIndex(hitObject.transform, out indiceFila, out indiceColumna))
+                        {
+                            selected1 = true;
+                            selectedPosition1 = $"0_{indiceFila}_{indiceColumna}";
+                            HighlightPiece(hitObject);
+                        }
                     }
                     if (selected1 && !selected2)
                     {
-                        if (selectedPosition1 != hitObject.name)
+                        int indiceFila, indiceColumna;
+                        if (TryFindTransformIndex(hitObject.transform, out indiceFila, out indiceColumna))
+                        {
+                            selectedPosition2 = $"0_{indiceFila}_{indiceColumna}";
+                        }
+                        if (selectedPosition1 != selectedPosition2)
                         {
                             selected2 = true;
-                            selectedPosition2 = hitObject.name;
                             HighlightPiece(hitObject);
                             SwapPieces(selectedPosition1, selectedPosition2);
                         }
@@ -163,6 +171,27 @@ public class GameManager : MonoBehaviour
     {
         string[] partes = nombrePieza.Split('_');
         return int.Parse(partes[2]);
+    }
+
+    private bool TryFindTransformIndex(Transform objetoBuscado, out int indiceFila, out int indiceColumna)
+    {
+        indiceFila = -1;
+        indiceColumna = -1;
+
+        for (int fila = 0; fila < piecesArray.GetLength(0); fila++)
+        {
+            for (int columna = 0; columna < piecesArray.GetLength(1); columna++)
+            {
+                if (piecesArray[fila, columna] == objetoBuscado)
+                {
+                    indiceFila = fila;
+                    indiceColumna = columna;
+                    return true; // Se encontró el objeto, retornamos true
+                }
+            }
+        }
+
+        return false; // No se encontró el objeto en la matriz
     }
 
     void Start()
