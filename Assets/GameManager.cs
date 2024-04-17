@@ -16,6 +16,9 @@ public class GameManager : MonoBehaviour
     private bool selected2 = false;
     private string selectedPosition2 = "";
 
+    private Transform[,] initialPiecesArray; // Matriz para almacenar la disposición inicial de las piezas
+    private bool waitBeforeChecking = true;
+
     private void CreateGamePieces(float gapThickness) {
         // This is the width of each tile.
         piecesArray = new Transform[size, size];
@@ -93,27 +96,15 @@ public class GameManager : MonoBehaviour
     private void UpdatePieceReference(GameObject pieza1, GameObject pieza2)
     {
         // Buscar la posición de las piezas en el arreglo piecesArray
-        int fila1 = ObtenerFila(pieza2.name), columna1 = ObtenerColumna(pieza2.name), fila2 = ObtenerFila(pieza1.name), columna2 = ObtenerColumna(pieza1.name);
-        for (int fila = 0; fila < size; fila++)
-        {
-            for (int columna = 0; columna < size; columna++)
-            {
-                if (piecesArray[fila, columna] == pieza1.transform) // Cambio aquí
-                {
-                    fila1 = fila;
-                    columna1 = columna;
-                }
-                else if (piecesArray[fila, columna] == pieza2.transform) // Cambio aquí
-                {
-                    fila2 = fila;
-                    columna2 = columna;
-                }
-            }
-        }
+        int fila1 = ObtenerFila(pieza2.name);
+        int columna1 = ObtenerColumna(pieza2.name);
+        int fila2 = ObtenerFila(pieza1.name);
+        int columna2 = ObtenerColumna(pieza1.name);
 
-        // Intercambiar las referencias en el arreglo
-        piecesArray[fila1, columna1] = pieza2.transform; // Cambio aquí
-        piecesArray[fila2, columna2] = pieza1.transform; // Cambio aquí
+        // Intercambiar las referencias en la matriz piecesArray
+        Transform temp = piecesArray[fila1, columna1];
+        piecesArray[fila1, columna1] = piecesArray[fila2, columna2];
+        piecesArray[fila2, columna2] = temp;
     }
 
 
@@ -194,13 +185,71 @@ public class GameManager : MonoBehaviour
         return false; // No se encontró el objeto en la matriz
     }
 
+    private void ShufflePuzzle()
+    {
+        for (int i = 0; i < 100; i++) // Cambiar el número de iteraciones para mayor aleatoriedad
+        {
+            int randomRow1 = Random.Range(0, size);
+            int randomCol1 = Random.Range(0, size);
+            int randomRow2 = Random.Range(0, size);
+            int randomCol2 = Random.Range(0, size);
+
+            // Obtener los nombres de las posiciones de las piezas aleatorias.
+            string position1 = $"0_{randomRow1}_{randomCol1}";
+            string position2 = $"0_{randomRow2}_{randomCol2}";
+
+            // Intercambiar las piezas aleatorias.
+            SwapPieces(position1, position2);
+        }
+
+    }
+
+    private void DisableWaitBeforeChecking()
+    {
+        waitBeforeChecking = false;
+    }
+
     void Start()
     {
         CreateGamePieces(0.01f);
+
+        // Copiar la disposición inicial de las piezas
+        initialPiecesArray = new Transform[size, size];
+        for (int row = 0; row < size; row++)
+        {
+            for (int col = 0; col < size; col++)
+            {
+                initialPiecesArray[row, col] = piecesArray[row, col];
+            }
+        }
+
+        Invoke("ShufflePuzzle", 5f);
+        Invoke("DisableWaitBeforeChecking", 5f);
     }
 
     void Update()
     {
         SelectPieces();
+
+        if (!waitBeforeChecking && PuzzleCompleted()){
+            Debug.Log("¡Rompecabezas resuelto!");
+            // Aquí puedes agregar cualquier código adicional para manejar la finalización del juego.
+        }
+    }
+
+    // Método para verificar si el rompecabezas ha vuelto a su posición inicial
+    private bool PuzzleCompleted()
+    {
+        for (int row = 0; row < size; row++)
+        {
+            for (int col = 0; col < size; col++)
+            {
+                if (piecesArray[row, col] != initialPiecesArray[row, col])
+                {
+                    return false; // Si alguna pieza no coincide con la disposición inicial, el rompecabezas no está completo
+                }
+            }
+        }
+        return true; // Si todas las piezas coinciden, el rompecabezas está completo
     }
 }
